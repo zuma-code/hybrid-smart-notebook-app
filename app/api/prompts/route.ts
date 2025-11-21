@@ -18,10 +18,11 @@ export async function GET(request: NextRequest) {
 
     const where: any = {};
 
+    // SQLite doesn't support case-insensitive mode
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { content: { contains: search, mode: "insensitive" } },
+        { title: { contains: search } },
+        { content: { contains: search } },
       ];
     }
 
@@ -39,16 +40,28 @@ export async function GET(request: NextRequest) {
         { isFavorite: "desc" },
         { updatedAt: "desc" },
       ],
-      include: {
-        tags: {
+    });
+
+    // Get tags for all prompts
+    const promptsWithTags = await Promise.all(
+      prompts.map(async (prompt) => {
+        const noteTags = await prisma.noteTag.findMany({
+          where: {
+            noteType: "Prompt",
+            noteId: prompt.id,
+          },
           include: {
             tag: true,
           },
-        },
-      },
-    });
+        });
+        return {
+          ...prompt,
+          tags: noteTags,
+        };
+      })
+    );
 
-    return NextResponse.json(prompts);
+    return NextResponse.json(promptsWithTags);
   } catch (error) {
     console.error("Error fetching prompts:", error);
     return NextResponse.json(
@@ -65,20 +78,19 @@ export async function POST(request: NextRequest) {
 
     const prompt = await prisma.prompt.create({
       data,
-      include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
-      },
     });
 
-    return NextResponse.json(prompt, { status: 201 });
+    return NextResponse.json(
+      {
+        ...prompt,
+        tags: [],
+      },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

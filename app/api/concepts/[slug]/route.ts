@@ -17,13 +17,6 @@ export async function GET(
 
     const concept = await prisma.concept.findUnique({
       where: { slug },
-      include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
-      },
     });
 
     if (!concept) {
@@ -32,6 +25,17 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Get tags for this concept
+    const noteTags = await prisma.noteTag.findMany({
+      where: {
+        noteType: "Concept",
+        noteId: concept.id,
+      },
+      include: {
+        tag: true,
+      },
+    });
 
     // Get backlinks (notes that link to this concept)
     const backlinks = await prisma.noteLink.findMany({
@@ -43,6 +47,7 @@ export async function GET(
 
     return NextResponse.json({
       ...concept,
+      tags: noteTags,
       backlinks,
     });
   } catch (error) {
@@ -83,7 +88,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

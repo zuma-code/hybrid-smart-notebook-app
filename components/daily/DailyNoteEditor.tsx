@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { formatDate, getTodayDateString } from "@/lib/utils";
@@ -19,6 +21,7 @@ interface Tag {
 interface DailyNote {
   id: string;
   date: string;
+  title?: string | null;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -26,53 +29,59 @@ interface DailyNote {
 }
 
 interface DailyNoteEditorProps {
-  date: string;
+  noteId?: string;
   initialNote: DailyNote | null;
 }
 
-export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
+export function DailyNoteEditor({ noteId, initialNote }: DailyNoteEditorProps) {
   const router = useRouter();
   const [content, setContent] = useState(initialNote?.content || "");
+  const [title, setTitle] = useState(initialNote?.title || "");
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<DailyNote | null>(initialNote);
   const [tags, setTags] = useState<Tag[]>(
     initialNote?.tags?.map((t) => t.tag) || []
   );
 
-  useEffect(() => {
-    if (!note) {
-      // Auto-create note if it doesn't exist
-      createNote();
+  const fetchTags = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`/api/notes/DailyNote/${id}/tags`);
+      if (res.ok) {
+        const fetchedTags = await res.json();
+        setTags(fetchedTags);
+      }
+    } catch (error) {
+      console.error("Error fetching tags:", error);
     }
   }, []);
 
-  const createNote = async () => {
-    try {
-      const res = await fetch("/api/daily", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, content: "" }),
-      });
-
-      if (res.ok) {
-        const newNote = await res.json();
-        setNote(newNote);
-      }
-    } catch (error) {
-      console.error("Error creating note:", error);
+  // Reset state when noteId or initialNote changes
+  useEffect(() => {
+    if (initialNote) {
+      setContent(initialNote.content || "");
+      setTitle(initialNote.title || "");
+      setNote(initialNote);
+      setTags(initialNote.tags?.map((t) => t.tag) || []);
     }
-  };
+  }, [noteId, initialNote?.id]);
 
-  const handleSave = async () => {
-    if (!note) return;
+  // Fetch tags when note is available
+  useEffect(() => {
+    if (note?.id && !initialNote?.tags) {
+      fetchTags(note.id);
+    }
+  }, [note?.id, initialNote?.tags, fetchTags]);
 
-    setSaving(true);
+  const handleSave = async (showSaving = true) => {
+    if (!note?.id) return;
+
+    if (showSaving) setSaving(true);
     try {
-      // Save the note content
-      const res = await fetch(`/api/daily/${date}`, {
+      // Save the note content and title
+      const res = await fetch(`/api/daily/${note.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ title: title || null, content }),
       });
 
       if (res.ok) {
@@ -93,24 +102,31 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
     } catch (error) {
       console.error("Error saving note:", error);
     } finally {
-      setSaving(false);
+      if (showSaving) setSaving(false);
     }
   };
 
-  const getPreviousDate = () => {
-    const d = new Date(date);
-    d.setDate(d.getDate() - 1);
-    return d.toISOString().split("T")[0];
-  };
+  // Auto-save after 2 seconds of no typing
+  useEffect(() => {
+    if (!note?.id || !content) return;
 
-  const getNextDate = () => {
-    const d = new Date(date);
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split("T")[0];
-  };
+    const timeoutId = setTimeout(() => {
+      handleSave(false); // Auto-save without showing saving state
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [content, title, note?.id]);
+
+  if (!note) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Cargando nota...</p>
+      </div>
+    );
+  }
 
   const today = getTodayDateString();
-  const isToday = date === today;
+  const isToday = note.date === today;
 
   return (
     <div className="space-y-4">
@@ -123,44 +139,44 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {formatDate(date)}
+              {title || formatDate(note.date)}
             </h1>
-            {isToday && (
-              <p className="text-sm text-muted-foreground">Hoy</p>
-            )}
+            <p className="text-sm text-muted-foreground">
+              {formatDate(note.date)} {isToday && "• Hoy"}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href={`/daily/${getPreviousDate()}`}>
-            <Button variant="outline" size="sm">
-              Anterior
-            </Button>
-          </Link>
-          <Link href={`/daily/${getNextDate()}`}>
-            <Button variant="outline" size="sm">
-              Siguiente
-            </Button>
-          </Link>
-          <Button onClick={handleSave} disabled={saving}>
-            <Save className="mr-2 h-4 w-4" />
-            {saving ? "Guardando..." : "Guardar"}
-          </Button>
-        </div>
+        <Button onClick={handleSave} disabled={saving}>
+          <Save className="mr-2 h-4 w-4" />
+          {saving ? "Guardando..." : "Guardar"}
+        </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Título (Opcional)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ej: Reunión de equipo, Ideas de proyecto..."
+            onBlur={() => handleSave(false)}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Tags</CardTitle>
         </CardHeader>
         <CardContent>
-          {note && (
-            <TagSelector
-              selectedTags={tags}
-              onTagsChange={setTags}
-              noteType="DailyNote"
-              noteId={note.id}
-            />
-          )}
+          <TagSelector
+            selectedTags={tags}
+            onTagsChange={setTags}
+            noteType="DailyNote"
+            noteId={note.id}
+          />
         </CardContent>
       </Card>
 
@@ -179,4 +195,3 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
     </div>
   );
 }
-

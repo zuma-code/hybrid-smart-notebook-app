@@ -12,22 +12,30 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get("search");
 
+    // SQLite doesn't support case-insensitive mode, so we'll filter in memory
     const where = search
       ? {
           name: {
             contains: search,
-            mode: "insensitive",
           },
         }
       : {};
 
-    const tags = await prisma.tag.findMany({
+    let tags = await prisma.tag.findMany({
       where,
       orderBy: {
         name: "asc",
       },
-      take: search ? 10 : undefined, // Limit results when searching
     });
+
+    // Filter case-insensitively for SQLite (since it doesn't support mode: "insensitive")
+    if (search) {
+      const searchLower = search.toLowerCase();
+      tags = tags.filter((tag) =>
+        tag.name.toLowerCase().includes(searchLower)
+      );
+      tags = tags.slice(0, 10); // Limit to 10 results
+    }
 
     return NextResponse.json(tags);
   } catch (error) {
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

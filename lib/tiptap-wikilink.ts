@@ -57,17 +57,5 @@ export const WikiLink = Node.create({
     };
   },
 
-  addCommands() {
-    return {
-      setWikiLink:
-        (attributes) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          });
-        },
-    };
-  },
 });
 

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 const createDailyNoteSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  title: z.string().optional(),
   content: z.string().default(""),
 });
 
@@ -30,27 +31,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createDailyNoteSchema.parse(body);
 
-    // Check if note already exists for this date
-    const existing = await prisma.dailyNote.findUnique({
-      where: { date: data.date },
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: "Daily note already exists for this date" },
-        { status: 409 }
-      );
-    }
-
+    // Allow multiple notes per day - no uniqueness check needed
     const note = await prisma.dailyNote.create({
-      data,
+      data: {
+        date: data.date,
+        title: data.title || null,
+        content: data.content || "",
+      },
     });
 
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

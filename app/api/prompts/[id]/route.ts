@@ -18,13 +18,6 @@ export async function GET(
 
     const prompt = await prisma.prompt.findUnique({
       where: { id },
-      include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
-      },
     });
 
     if (!prompt) {
@@ -34,7 +27,21 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(prompt);
+    // Get tags for this prompt
+    const noteTags = await prisma.noteTag.findMany({
+      where: {
+        noteType: "Prompt",
+        noteId: prompt.id,
+      },
+      include: {
+        tag: true,
+      },
+    });
+
+    return NextResponse.json({
+      ...prompt,
+      tags: noteTags,
+    });
   } catch (error) {
     console.error("Error fetching prompt:", error);
     return NextResponse.json(
@@ -56,20 +63,27 @@ export async function PUT(
     const prompt = await prisma.prompt.update({
       where: { id },
       data,
+    });
+
+    // Get tags for this prompt
+    const noteTags = await prisma.noteTag.findMany({
+      where: {
+        noteType: "Prompt",
+        noteId: prompt.id,
+      },
       include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        tag: true,
       },
     });
 
-    return NextResponse.json(prompt);
+    return NextResponse.json({
+      ...prompt,
+      tags: noteTags,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

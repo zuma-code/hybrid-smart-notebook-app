@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
-import { lowlight } from "lowlight";
+import { createLowlight } from "lowlight";
 import { useEffect } from "react";
 import { WikiLink } from "@/lib/tiptap-wikilink";
 import { extractWikiLinks, convertWikiLinksToHTML } from "@/lib/wiki-links";
@@ -17,11 +17,13 @@ import python from "highlight.js/lib/languages/python";
 import css from "highlight.js/lib/languages/css";
 import html from "highlight.js/lib/languages/xml";
 
-lowlight.registerLanguage("javascript", javascript);
-lowlight.registerLanguage("typescript", typescript);
-lowlight.registerLanguage("python", python);
-lowlight.registerLanguage("css", css);
-lowlight.registerLanguage("html", html);
+const lowlight = createLowlight();
+
+lowlight.register("javascript", javascript);
+lowlight.register("typescript", typescript);
+lowlight.register("python", python);
+lowlight.register("css", css);
+lowlight.register("html", html);
 
 interface RichTextEditorProps {
   content: string;
@@ -35,6 +37,7 @@ export function RichTextEditor({
   placeholder = "Escribe aquí...",
 }: RichTextEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         codeBlock: false, // We'll use CodeBlockLowlight instead

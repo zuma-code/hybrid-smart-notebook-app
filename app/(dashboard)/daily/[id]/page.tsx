@@ -1,9 +1,9 @@
 import { DailyNoteEditor } from "@/components/daily/DailyNoteEditor";
 import { notFound } from "next/navigation";
 
-async function getDailyNote(date: string) {
+async function getDailyNote(id: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/daily/${date}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/daily/${id}`, {
       cache: "no-store",
     });
 
@@ -21,17 +21,16 @@ async function getDailyNote(date: string) {
 export default async function DailyNotePage({
   params,
 }: {
-  params: Promise<{ date: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { date } = await params;
+  const { id } = await params;
 
-  // Validate date format
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  const note = await getDailyNote(id);
+
+  if (!note) {
     notFound();
   }
 
-  const note = await getDailyNote(date);
-
-  return <DailyNoteEditor date={date} initialNote={note} />;
+  return <DailyNoteEditor noteId={id} initialNote={note} />;
 }
 

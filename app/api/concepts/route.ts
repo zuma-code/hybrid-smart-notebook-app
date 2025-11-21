@@ -13,11 +13,12 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get("search");
 
+    // SQLite doesn't support case-insensitive mode
     const where = search
       ? {
           OR: [
-            { title: { contains: search, mode: "insensitive" } },
-            { content: { contains: search, mode: "insensitive" } },
+            { title: { contains: search } },
+            { content: { contains: search } },
           ],
         }
       : {};
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }
