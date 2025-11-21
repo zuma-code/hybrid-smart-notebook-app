@@ -57,6 +57,7 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
 
     setSaving(true);
     try {
+      // Save the note content
       const res = await fetch(`/api/daily/${date}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -66,6 +67,17 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
       if (res.ok) {
         const updated = await res.json();
         setNote(updated);
+
+        // Update bidirectional links
+        await fetch("/api/links", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromNoteType: "DailyNote",
+            fromNoteId: updated.id,
+            content,
+          }),
+        });
       }
     } catch (error) {
       console.error("Error saving note:", error);

@@ -51,6 +51,17 @@ export function ConceptView({ concept: initialConcept }: ConceptViewProps) {
         if (updated.slug !== concept.slug) {
           router.push(`/concepts/${updated.slug}`);
         }
+
+        // Update bidirectional links
+        await fetch("/api/links", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromNoteType: "Concept",
+            fromNoteId: updated.id,
+            content,
+          }),
+        });
       }
     } catch (error) {
       console.error("Error saving concept:", error);

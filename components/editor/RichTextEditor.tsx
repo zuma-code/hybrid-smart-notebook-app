@@ -7,6 +7,8 @@ import Image from "@tiptap/extension-image";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { lowlight } from "lowlight";
 import { useEffect } from "react";
+import { WikiLink } from "@/lib/tiptap-wikilink";
+import { extractWikiLinks, convertWikiLinksToHTML } from "@/lib/wiki-links";
 
 // Register languages for syntax highlighting
 import javascript from "highlight.js/lib/languages/javascript";
@@ -54,6 +56,7 @@ export function RichTextEditor({
           class: "rounded-md bg-muted p-4 font-mono text-sm",
         },
       }),
+      WikiLink,
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -69,7 +72,9 @@ export function RichTextEditor({
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+      // Convert wiki links to HTML before setting content
+      const contentWithWikiLinks = convertWikiLinksToHTML(content);
+      editor.commands.setContent(contentWithWikiLinks);
     }
   }, [content, editor]);
 
