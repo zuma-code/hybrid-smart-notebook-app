@@ -8,6 +8,13 @@ import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { formatDate, getTodayDateString } from "@/lib/utils";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { TagSelector } from "@/components/tags/TagSelector";
+
+interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
 
 interface DailyNote {
   id: string;
@@ -15,6 +22,7 @@ interface DailyNote {
   content: string;
   createdAt: string;
   updatedAt: string;
+  tags?: Array<{ tag: Tag }>;
 }
 
 interface DailyNoteEditorProps {
@@ -27,6 +35,9 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
   const [content, setContent] = useState(initialNote?.content || "");
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<DailyNote | null>(initialNote);
+  const [tags, setTags] = useState<Tag[]>(
+    initialNote?.tags?.map((t) => t.tag) || []
+  );
 
   useEffect(() => {
     if (!note) {
@@ -136,6 +147,22 @@ export function DailyNoteEditor({ date, initialNote }: DailyNoteEditorProps) {
           </Button>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Tags</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {note && (
+            <TagSelector
+              selectedTags={tags}
+              onTagsChange={setTags}
+              noteType="DailyNote"
+              noteId={note.id}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

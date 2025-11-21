@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { TagSelector } from "@/components/tags/TagSelector";
+
+interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
 
 interface Concept {
   id: string;
@@ -15,6 +22,7 @@ interface Concept {
   content: string;
   createdAt: string;
   updatedAt: string;
+  tags?: Array<{ tag: Tag }>;
   backlinks?: Array<{
     id: string;
     fromNoteType: string;
@@ -34,6 +42,28 @@ export function ConceptView({ concept: initialConcept }: ConceptViewProps) {
   const [title, setTitle] = useState(concept.title);
   const [content, setContent] = useState(concept.content);
   const [saving, setSaving] = useState(false);
+  const [tags, setTags] = useState<Tag[]>(
+    initialConcept.tags?.map((t) => t.tag) || []
+  );
+
+  useEffect(() => {
+    // Fetch tags when concept changes
+    if (concept.id) {
+      fetchTags();
+    }
+  }, [concept.id]);
+
+  const fetchTags = async () => {
+    try {
+      const res = await fetch(`/api/notes/Concept/${concept.id}/tags`);
+      if (res.ok) {
+        const fetchedTags = await res.json();
+        setTags(fetchedTags);
+      }
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -132,6 +162,20 @@ export function ConceptView({ concept: initialConcept }: ConceptViewProps) {
           )}
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Tags</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TagSelector
+            selectedTags={tags}
+            onTagsChange={setTags}
+            noteType="Concept"
+            noteId={concept.id}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

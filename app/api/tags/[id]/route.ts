@@ -2,40 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
-const updateDailyNoteSchema = z.object({
-  content: z.string(),
+const updateTagSchema = z.object({
+  name: z.string().min(1).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
 });
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ date: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { date } = await params;
+    const { id } = await params;
 
-    const note = await prisma.dailyNote.findUnique({
-      where: { date },
+    const tag = await prisma.tag.findUnique({
+      where: { id },
       include: {
-        tags: {
-          include: {
-            tag: true,
-          },
+        noteTags: {
+          take: 10, // Limit to avoid too much data
         },
       },
     });
 
-    if (!note) {
+    if (!tag) {
       return NextResponse.json(
-        { error: "Daily note not found" },
+        { error: "Tag not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(note);
+    return NextResponse.json(tag);
   } catch (error) {
-    console.error("Error fetching daily note:", error);
+    console.error("Error fetching tag:", error);
     return NextResponse.json(
-      { error: "Failed to fetch daily note" },
+      { error: "Failed to fetch tag" },
       { status: 500 }
     );
   }
@@ -43,19 +42,19 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ date: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { date } = await params;
+    const { id } = await params;
     const body = await request.json();
-    const data = updateDailyNoteSchema.parse(body);
+    const data = updateTagSchema.parse(body);
 
-    const note = await prisma.dailyNote.update({
-      where: { date },
+    const tag = await prisma.tag.update({
+      where: { id },
       data,
     });
 
-    return NextResponse.json(note);
+    return NextResponse.json(tag);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -71,14 +70,14 @@ export async function PUT(
       error.code === "P2025"
     ) {
       return NextResponse.json(
-        { error: "Daily note not found" },
+        { error: "Tag not found" },
         { status: 404 }
       );
     }
 
-    console.error("Error updating daily note:", error);
+    console.error("Error updating tag:", error);
     return NextResponse.json(
-      { error: "Failed to update daily note" },
+      { error: "Failed to update tag" },
       { status: 500 }
     );
   }
@@ -86,16 +85,16 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ date: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { date } = await params;
+    const { id } = await params;
 
-    await prisma.dailyNote.delete({
-      where: { date },
+    await prisma.tag.delete({
+      where: { id },
     });
 
-    return NextResponse.json({ message: "Daily note deleted successfully" });
+    return NextResponse.json({ message: "Tag deleted successfully" });
   } catch (error) {
     if (
       error &&
@@ -104,14 +103,14 @@ export async function DELETE(
       error.code === "P2025"
     ) {
       return NextResponse.json(
-        { error: "Daily note not found" },
+        { error: "Tag not found" },
         { status: 404 }
       );
     }
 
-    console.error("Error deleting daily note:", error);
+    console.error("Error deleting tag:", error);
     return NextResponse.json(
-      { error: "Failed to delete daily note" },
+      { error: "Failed to delete tag" },
       { status: 500 }
     );
   }
