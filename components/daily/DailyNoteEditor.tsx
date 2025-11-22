@@ -9,6 +9,8 @@ import Link from "next/link";
 import { formatDate, getTodayDateString } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { TagSelector } from "@/components/tags/TagSelector";
 
 interface Tag {
   id: string;
@@ -36,12 +38,33 @@ export function DailyNoteEditor({ initialNote }: DailyNoteEditorProps) {
   const [title, setTitle] = useState(initialNote?.title || "");
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<DailyNote | null>(initialNote);
+  const [tags, setTags] = useState<Tag[]>(initialNote?.tags || []);
+
+  const fetchTags = async (noteId: string) => {
+    try {
+      const res = await fetch(`/api/notes/DailyNote/${noteId}/tags`);
+      if (res.ok) {
+        const fetchedTags = await res.json();
+        setTags(fetchedTags);
+      }
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
 
   useEffect(() => {
     setContent(initialNote?.content || "");
     setTitle(initialNote?.title || "");
     setNote(initialNote);
+    setTags(initialNote?.tags || []);
   }, [initialNote?.id]);
+
+  // Cargar tags si la nota tiene ID pero no vienen en initialNote
+  useEffect(() => {
+    if (note?.id && !initialNote?.tags) {
+      fetchTags(note.id);
+    }
+  }, [note?.id, initialNote?.tags]);
 
   const handleSave = useCallback(async (showSaving = true) => {
     if (!note) return;
@@ -118,14 +141,33 @@ export function DailyNoteEditor({ initialNote }: DailyNoteEditorProps) {
 
       <Card>
         <CardHeader>
+          <CardTitle>Tags</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {note?.id ? (
+            <TagSelector
+              selectedTags={tags}
+              onTagsChange={setTags}
+              noteType="DailyNote"
+              noteId={note.id}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Guarda la nota primero para agregar tags
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Contenido</CardTitle>
         </CardHeader>
         <CardContent>
-          <textarea
-            className="w-full min-h-[400px] p-4 border rounded-md resize-y"
+          <RichTextEditor
+            content={content}
+            onChange={setContent}
             placeholder="Escribe tus pensamientos, ideas y aprendizajes del día..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
             disabled={!note}
           />
         </CardContent>
