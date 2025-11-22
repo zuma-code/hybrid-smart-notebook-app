@@ -51,6 +51,7 @@ export function RichTextEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false, // Usaremos CodeBlockLowlight en su lugar
+        link: false, // Deshabilitamos Link de StarterKit, lo agregamos manualmente
       }),
       CodeBlockLowlight.configure({
         lowlight,

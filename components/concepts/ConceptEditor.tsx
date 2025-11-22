@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +40,7 @@ export function ConceptEditor({ initialConcept = null, onCancel }: ConceptEditor
   const [saving, setSaving] = useState(false);
   const [concept, setConcept] = useState<Concept | null>(initialConcept);
   const [tags, setTags] = useState<Tag[]>(initialConcept?.tags || []);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchTags = async (conceptId: string) => {
     try {
@@ -106,11 +107,30 @@ export function ConceptEditor({ initialConcept = null, onCancel }: ConceptEditor
         if (res.ok) {
           const created = await res.json();
           setConcept(created);
+          
+          // Sync wiki-links after creation
+          try {
+            await fetch(`/api/notes/Concept/${created.id}/links`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content }),
+            });
+          } catch (error) {
+            console.error("Error syncing wiki-links:", error);
+          }
+          
           router.push(`/concepts/${created.slug}`);
+        } else {
+          const errorData = await res.json().catch(() => ({}));
+          console.error("Error creating concept:", errorData);
+          alert(`Error al crear concepto: ${errorData.error || "Error desconocido"}`);
         }
       }
     } catch (error) {
       console.error("Error saving concept:", error);
+      if (showSaving) {
+        alert(`Error al guardar: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      }
     } finally {
       if (showSaving) setSaving(false);
     }
@@ -118,13 +138,24 @@ export function ConceptEditor({ initialConcept = null, onCancel }: ConceptEditor
 
   useEffect(() => {
     if (!title.trim()) return;
+    if (concept) return; // Si ya existe el concepto, solo actualizar
 
-    const timeoutId = setTimeout(() => {
+    // Cancelar auto-save anterior
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Programar nuevo auto-save
+    autoSaveTimeoutRef.current = setTimeout(() => {
       handleSave(false);
     }, 2000);
 
-    return () => clearTimeout(timeoutId);
-  }, [content, title, handleSave]);
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [content, title, handleSave, concept]);
 
   return (
     <div className="space-y-4">
@@ -147,7 +178,17 @@ export function ConceptEditor({ initialConcept = null, onCancel }: ConceptEditor
             </h1>
           </div>
         </div>
-        <Button onClick={() => handleSave()} disabled={saving || !title.trim()}>
+        <Button
+          onClick={async () => {
+            // Cancelar auto-save pendiente
+            if (autoSaveTimeoutRef.current) {
+              clearTimeout(autoSaveTimeoutRef.current);
+              autoSaveTimeoutRef.current = null;
+            }
+            await handleSave(true);
+          }}
+          disabled={saving || !title.trim()}
+        >
           <Save className="mr-2 h-4 w-4" />
           {saving ? "Guardando..." : concept ? "Guardar" : "Crear"}
         </Button>
