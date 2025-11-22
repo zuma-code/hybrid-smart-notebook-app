@@ -11,10 +11,14 @@ import { QuickCapture } from "./QuickCapture";
 interface DailyNote {
   id: string;
   date: string;
-  title?: string | null;
+  title?: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface GroupedNotes {
+  [date: string]: DailyNote[];
 }
 
 export function DailyNoteList() {
@@ -39,34 +43,40 @@ export function DailyNoteList() {
     }
   };
 
+  const today = getTodayDateString();
+
+  const groupedNotes: GroupedNotes = notes.reduce((acc, note) => {
+    (acc[note.date] = acc[note.date] || []).push(note);
+    return acc;
+  }, {} as GroupedNotes);
+
+  const sortedDates = Object.keys(groupedNotes).sort((a, b) => b.localeCompare(a));
+
   if (loading) {
     return <div className="text-muted-foreground">Cargando notas...</div>;
   }
 
-  // Group notes by date
-  const notesByDate = notes.reduce((acc, note) => {
-    if (!acc[note.date]) {
-      acc[note.date] = [];
-    }
-    acc[note.date].push(note);
-    return acc;
-  }, {} as Record<string, DailyNote[]>);
-
-  const sortedDates = Object.keys(notesByDate).sort((a, b) => b.localeCompare(a));
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Tus Notas Diarias</h2>
-        <QuickCapture
-          trigger={
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nueva Nota
+        <div className="flex gap-2">
+          <Link href={`/daily/${today}`}>
+            <Button variant="outline">
+              <Calendar className="mr-2 h-4 w-4" />
+              Nota de Hoy
             </Button>
-          }
-          onNoteCreated={fetchNotes}
-        />
+          </Link>
+          <QuickCapture
+            trigger={
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Nueva Nota
+              </Button>
+            }
+            onNoteCreated={fetchNotes}
+          />
+        </div>
       </div>
 
       {notes.length === 0 ? (
@@ -82,58 +92,45 @@ export function DailyNoteList() {
               trigger={
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  Crear Primera Nota
+                  Crear Nota de Hoy
                 </Button>
               }
+              defaultDate={today}
               onNoteCreated={fetchNotes}
             />
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-6">
-          {sortedDates.map((date) => {
-            const dateNotes = notesByDate[date];
-            const isToday = date === getTodayDateString();
-            
-            return (
-              <div key={date} className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold">
-                    {formatDate(date)}
-                    {isToday && (
-                      <span className="ml-2 text-sm font-normal text-muted-foreground">
-                        • Hoy
-                      </span>
-                    )}
-                  </h3>
-                  <span className="text-sm text-muted-foreground">
-                    ({dateNotes.length} {dateNotes.length === 1 ? "nota" : "notas"})
-                  </span>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {dateNotes.map((note) => (
-                    <Link key={note.id} href={`/daily/${note.id}`}>
-                      <Card className="hover:bg-accent transition-colors cursor-pointer h-full">
-                        <CardHeader>
-                          <CardTitle className="text-lg">
-                            {note.title || "Sin título"}
-                          </CardTitle>
-                          <CardDescription>
-                            {note.content
-                              ? `${note.content.substring(0, 100)}${note.content.length > 100 ? "..." : ""}`
-                              : "Nota vacía"}
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
+          {sortedDates.map((date) => (
+            <div key={date} className="space-y-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-muted-foreground" />
+                {formatDate(date)} ({groupedNotes[date].length})
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {groupedNotes[date].map((note) => (
+                  <Link key={note.id} href={`/daily/${note.id}`}>
+                    <Card className="hover:bg-accent transition-colors cursor-pointer">
+                      <CardHeader>
+                        <CardTitle className="text-lg">
+                          {note.title || "Sin título"}
+                        </CardTitle>
+                        <CardDescription>
+                          {note.content
+                            ? `${note.content.substring(0, 100)}${note.content.length > 100 ? "..." : ""}`
+                            : "Nota vacía"}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 }
+

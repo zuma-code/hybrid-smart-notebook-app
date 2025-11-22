@@ -11,9 +11,10 @@ const createDailyNoteSchema = z.object({
 export async function GET() {
   try {
     const notes = await prisma.dailyNote.findMany({
-      orderBy: {
-        date: "desc",
-      },
+      orderBy: [
+        { date: "desc" },
+        { createdAt: "desc" },
+      ],
     });
 
     return NextResponse.json(notes);
@@ -31,13 +32,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createDailyNoteSchema.parse(body);
 
-    // Allow multiple notes per day - no uniqueness check needed
     const note = await prisma.dailyNote.create({
-      data: {
-        date: data.date,
-        title: data.title || null,
-        content: data.content || "",
-      },
+      data,
     });
 
     return NextResponse.json(note, { status: 201 });

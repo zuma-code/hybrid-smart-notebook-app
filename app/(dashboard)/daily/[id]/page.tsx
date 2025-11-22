@@ -31,6 +31,6 @@ export default async function DailyNotePage({
     notFound();
   }
 
-  return <DailyNoteEditor noteId={id} initialNote={note} />;
+  return <DailyNoteEditor initialNote={note} />;
 }
 

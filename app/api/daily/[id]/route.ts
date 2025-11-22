@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const updateDailyNoteSchema = z.object({
   title: z.string().optional(),
-  content: z.string(),
+  content: z.string().optional(),
 });
 
 export async function GET(
@@ -38,7 +38,7 @@ export async function GET(
 
     return NextResponse.json({
       ...note,
-      tags: noteTags,
+      tags: noteTags.map((nt) => nt.tag),
     });
 
   } catch (error) {
@@ -61,10 +61,7 @@ export async function PUT(
 
     const note = await prisma.dailyNote.update({
       where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title || null }),
-        content: data.content,
-      },
+      data,
     });
 
     return NextResponse.json(note);

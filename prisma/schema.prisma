@@ -12,8 +12,8 @@ datasource db {
 
 model DailyNote {
   id        String   @id @default(cuid())
-  date      String   // Format: YYYY-MM-DD (no unique, allows multiple notes per day)
-  title     String?  // Optional title to differentiate notes
+  date      String   // Format: YYYY-MM-DD
+  title     String?  // Optional title for multiple notes per day
   content   String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,3 +93,4 @@ model NoteLink {
   @@index([fromNoteType, fromNoteId])
   @@index([toNoteType, toNoteId])
 }
+

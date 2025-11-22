@@ -1,69 +1,36 @@
-# 📓 Hybrid Smart Notebook App
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Una aplicación web híbrida de organización de apuntes para programación que combina cuaderno diario con base de conocimiento.
+## Getting Started
 
-## 🎯 Características
-
-- **Daily Notes**: Cuaderno diario con notas por fecha
-- **Concept Library**: Biblioteca de conceptos de programación con enlaces bidireccionales
-- **Prompt Vault**: Repositorio organizado de prompts de Cursor/chat
-- **Image Gallery**: Galería de imágenes con upload drag & drop
-- **Global Search**: Búsqueda avanzada en todas las notas
-- **Rich Editor**: Editor Markdown con syntax highlighting
-
-## 🛠️ Stack Tecnológico
-
-- Next.js 14+ (App Router)
-- React 18+
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Prisma + SQLite
-- TipTap
-- Shiki
-- Fuse.js
-
-## 🚀 Inicio Rápido
-
-### Prerrequisitos
-
-- Node.js 18+ 
-- npm o yarn
-
-### Instalación
+First, run the development server:
 
 ```bash
-# Instalar dependencias
-npm install
-
-# Configurar base de datos
-npx prisma migrate dev
-
-# Ejecutar en desarrollo
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📚 Documentación
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- [Arquitectura](./docs/architecture.md)
-- [Fuentes de Investigación](./docs/research-sources.md)
-- [Guía de Usuario](./docs/user-guide.md) (próximamente)
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 📝 Scripts Disponibles
+## Learn More
 
-- `npm run dev` - Inicia servidor de desarrollo
-- `npm run build` - Construye para producción
-- `npm run start` - Inicia servidor de producción
-- `npm run lint` - Ejecuta ESLint
-- `npm run format` - Formatea código con Prettier
-- `npm run format:check` - Verifica formato
+To learn more about Next.js, take a look at the following resources:
 
-## 🗂️ Estructura del Proyecto
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-Ver [docs/architecture.md](./docs/architecture.md) para detalles completos.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 📄 Licencia
+## Deploy on Vercel
 
-Este proyecto es de uso personal.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

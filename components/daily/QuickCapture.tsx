@@ -26,10 +26,8 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(defaultDate || getTodayDateString());
   const [title, setTitle] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Reset form when dialog opens
   useEffect(() => {
     if (open) {
       setDate(defaultDate || getTodayDateString());
@@ -38,34 +36,25 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
   }, [open, defaultDate]);
 
   const handleCreate = async () => {
-    if (!date) return;
+    if (date) {
+      try {
+        const res = await fetch("/api/daily", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, title: title || undefined, content: "" }),
+        });
 
-    setLoading(true);
-    try {
-      const res = await fetch("/api/daily", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date,
-          title: title.trim() || undefined,
-          content: "",
-        }),
-      });
-
-      if (res.ok) {
-        const newNote = await res.json();
-        setOpen(false);
-        if (onNoteCreated) {
-          onNoteCreated();
+        if (res.ok) {
+          const newNote = await res.json();
+          router.push(`/daily/${newNote.id}`);
+          setOpen(false);
+          onNoteCreated?.();
+        } else {
+          console.error("Failed to create daily note:", await res.json());
         }
-        router.push(`/daily/${newNote.id}`);
-      } else {
-        console.error("Error creating note");
+      } catch (error) {
+        console.error("Error creating daily note:", error);
       }
-    } catch (error) {
-      console.error("Error creating note:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -87,7 +76,7 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
         <DialogHeader>
           <DialogTitle>Nueva Daily Note</DialogTitle>
           <DialogDescription>
-            Crea una nueva nota diaria. Puedes crear múltiples notas para el mismo día.
+            Selecciona la fecha y opcionalmente un título para tu nueva nota diaria
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -102,29 +91,23 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
             />
           </div>
           <div>
-            <Label htmlFor="title">Título (Opcional)</Label>
+            <Label htmlFor="title">Título (opcional)</Label>
             <Input
               id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ej: Reunión de equipo, Ideas de proyecto..."
+              placeholder="Ej: Ideas para el proyecto X"
               className="mt-1"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleCreate();
-                }
-              }}
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleCreate} disabled={loading || !date}>
+            <Button onClick={handleCreate}>
               <Calendar className="mr-2 h-4 w-4" />
-              {loading ? "Creando..." : "Crear Nota"}
+              Crear Nota
             </Button>
           </div>
         </div>
@@ -132,3 +115,4 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
     </Dialog>
   );
 }
+
