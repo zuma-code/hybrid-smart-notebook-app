@@ -7,7 +7,9 @@ import Image from "@tiptap/extension-image";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { createLowlight } from "lowlight";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { WikiLink } from "@/lib/tiptap-wikilink";
 
 // Importar algunos lenguajes comunes para syntax highlighting
 import javascript from "highlight.js/lib/languages/javascript";
@@ -43,6 +45,8 @@ export function RichTextEditor({
   disabled = false,
   className,
 }: RichTextEditorProps) {
+  const router = useRouter();
+  
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -62,6 +66,7 @@ export function RichTextEditor({
           class: "max-w-full h-auto rounded-lg",
         },
       }),
+      WikiLink,
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -77,6 +82,31 @@ export function RichTextEditor({
       editor.commands.setContent(content);
     }
   }, [content, editor]);
+
+  // Handle wiki-link clicks
+  useEffect(() => {
+    if (!editor || disabled) return;
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const wikiLink = target.closest(".wiki-link");
+      
+      if (wikiLink) {
+        event.preventDefault();
+        const slug = wikiLink.getAttribute("data-wiki-slug");
+        if (slug) {
+          router.push(`/concepts/${slug}`);
+        }
+      }
+    };
+
+    const editorElement = editor.view.dom;
+    editorElement.addEventListener("click", handleClick);
+
+    return () => {
+      editorElement.removeEventListener("click", handleClick);
+    };
+  }, [editor, disabled, router]);
 
   if (!editor) {
     return (

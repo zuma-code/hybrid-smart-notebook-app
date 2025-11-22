@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { TagSelector } from "@/components/tags/TagSelector";
+import { extractWikiLinks } from "@/lib/wiki-links";
 
 interface Tag {
   id: string;
@@ -80,6 +81,17 @@ export function DailyNoteEditor({ initialNote }: DailyNoteEditorProps) {
       if (res.ok) {
         const updated = await res.json();
         setNote(updated);
+        
+        // Sync wiki-links
+        try {
+          await fetch(`/api/notes/DailyNote/${note.id}/links`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content }),
+          });
+        } catch (error) {
+          console.error("Error syncing wiki-links:", error);
+        }
       }
     } catch (error) {
       console.error("Error saving note:", error);

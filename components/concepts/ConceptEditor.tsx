@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { TagSelector } from "@/components/tags/TagSelector";
+import { extractWikiLinks } from "@/lib/wiki-links";
 
 interface Tag {
   id: string;
@@ -82,6 +83,17 @@ export function ConceptEditor({ initialConcept = null, onCancel }: ConceptEditor
         if (res.ok) {
           const updated = await res.json();
           setConcept(updated);
+          
+          // Sync wiki-links
+          try {
+            await fetch(`/api/notes/Concept/${concept.id}/links`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content }),
+            });
+          } catch (error) {
+            console.error("Error syncing wiki-links:", error);
+          }
         }
       } else {
         // Create new concept

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
@@ -36,6 +37,72 @@ interface Concept {
 
 interface ConceptViewProps {
   slug: string;
+}
+
+function BacklinkItem({ backlink }: { backlink: Backlink }) {
+  const [noteTitle, setNoteTitle] = useState<string>("Cargando...");
+  const [noteUrl, setNoteUrl] = useState<string>("#");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNoteInfo = async () => {
+      try {
+        if (backlink.fromNoteType === "DailyNote") {
+          const res = await fetch(`/api/daily/${backlink.fromNoteId}`);
+          if (res.ok) {
+            const note = await res.json();
+            const date = new Date(note.date).toLocaleDateString("es-ES");
+            setNoteTitle(note.title || `Nota del ${date}`);
+            setNoteUrl(`/daily/${note.id}`);
+          } else {
+            setNoteTitle("Nota no encontrada");
+          }
+        } else if (backlink.fromNoteType === "Concept") {
+          // For concepts, we need to find by ID, not slug
+          // We'll need to get all concepts and find the one with matching ID
+          const res = await fetch("/api/concepts");
+          if (res.ok) {
+            const concepts = await res.json();
+            const concept = concepts.find((c: Concept) => c.id === backlink.fromNoteId);
+            if (concept) {
+              setNoteTitle(concept.title);
+              setNoteUrl(`/concepts/${concept.slug}`);
+            } else {
+              setNoteTitle("Concepto no encontrado");
+            }
+          } else {
+            setNoteTitle("Concepto no encontrado");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching backlink info:", error);
+        setNoteTitle("Error al cargar");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNoteInfo();
+  }, [backlink]);
+
+  if (loading) {
+    return (
+      <div className="p-2 rounded-md">
+        <span className="text-sm text-muted-foreground">Cargando...</span>
+      </div>
+    );
+  }
+
+  return (
+    <Link href={noteUrl}>
+      <div className="flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors cursor-pointer">
+        <span className="text-sm font-medium">{noteTitle}</span>
+        <span className="text-xs text-muted-foreground">
+          ({backlink.fromNoteType === "DailyNote" ? "Nota diaria" : "Concepto"})
+        </span>
+      </div>
+    </Link>
+  );
 }
 
 export function ConceptView({ slug }: ConceptViewProps) {
@@ -177,10 +244,14 @@ export function ConceptView({ slug }: ConceptViewProps) {
             <CardTitle>Enlaces relacionados</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-4">
               {concept.backlinks.length} nota(s) hacen referencia a este concepto
             </p>
-            {/* TODO: Implementar lista de backlinks con navegación */}
+            <div className="space-y-2">
+              {concept.backlinks.map((backlink) => (
+                <BacklinkItem key={backlink.id} backlink={backlink} />
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
