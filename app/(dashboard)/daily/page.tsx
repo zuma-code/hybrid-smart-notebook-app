@@ -4,3 +4,5 @@ export default function DailyNotesPage() {
   return <DailyNoteList />;
 }
 
+
+

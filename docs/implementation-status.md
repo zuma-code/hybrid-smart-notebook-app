@@ -334,3 +334,5 @@
 - La estructura de carpetas está preparada para todas las funcionalidades.
 - Falta implementar la mayoría de las API routes (solo Daily Notes está completo).
 
+
+
