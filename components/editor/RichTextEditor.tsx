@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { WikiLink } from "@/lib/tiptap-wikilink";
+import { ImagePicker } from "@/components/gallery/ImagePicker";
 
 // Importar algunos lenguajes comunes para syntax highlighting
 import javascript from "highlight.js/lib/languages/javascript";
@@ -252,6 +253,22 @@ export function RichTextEditor({
         >
           🔗
         </button>
+        <div className="w-px h-6 bg-border mx-1" />
+        {!disabled && (
+          <ImagePicker
+            onSelect={(imagePath, alt) => {
+              editor.chain().focus().setImage({ src: imagePath, alt }).run();
+            }}
+            trigger={
+              <button
+                type="button"
+                className="px-2 py-1 rounded text-sm font-medium transition-colors hover:bg-muted"
+              >
+                🖼️
+              </button>
+            }
+          />
+        )}
       </div>
 
       {/* Editor */}
