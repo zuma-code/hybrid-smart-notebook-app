@@ -1,24 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 Hybrid Smart Notebook - Apuntes para Programación
 
-## Getting Started
+Aplicación web híbrida de organización de apuntes para programación. Un cuaderno digital inteligente donde puedes guardar notas diarias, conceptos, prompts y más.
 
-First, run the development server:
+## 🚀 Inicio Rápido
+
+Primero, ejecuta el servidor de desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📖 Documentación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[Cómo Funciona la App](./docs/como-funciona-la-app.md)** - Guía completa para principiantes sobre cómo funciona la aplicación y Next.js
+- **[Estado de Implementación](./docs/implementation-status.md)** - Estado actual del desarrollo del proyecto
+
+## 🛠️ Tecnologías
+
+- **Next.js 16** - Framework de React
+- **TypeScript** - Tipado estático
+- **Prisma** - ORM para base de datos
+- **SQLite** - Base de datos
+- **Tailwind CSS** - Estilos
+- **shadcn/ui** - Componentes UI
+- **TipTap** - Editor de texto rico (pendiente de implementar completamente)
 
 ## Learn More
 

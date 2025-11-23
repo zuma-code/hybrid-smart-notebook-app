@@ -118,3 +118,6 @@ export function QuickCapture({ trigger, defaultDate, onNoteCreated }: QuickCaptu
 
 
 
+
+
+

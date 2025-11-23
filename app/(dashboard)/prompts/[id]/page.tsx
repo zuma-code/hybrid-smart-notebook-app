@@ -10,3 +10,6 @@ export default async function PromptPage({
   return <PromptView id={id} />;
 }
 
+
+
+

@@ -10,3 +10,6 @@ export default async function ConceptPage({
   return <ConceptView slug={slug} />;
 }
 
+
+
+
