@@ -1,69 +1,43 @@
-# 📓 Hybrid Smart Notebook App
+# 📚 Hybrid Smart Notebook - Apuntes para Programación
 
-Una aplicación web híbrida de organización de apuntes para programación que combina cuaderno diario con base de conocimiento.
-
-## 🎯 Características
-
-- **Daily Notes**: Cuaderno diario con notas por fecha
-- **Concept Library**: Biblioteca de conceptos de programación con enlaces bidireccionales
-- **Prompt Vault**: Repositorio organizado de prompts de Cursor/chat
-- **Image Gallery**: Galería de imágenes con upload drag & drop
-- **Global Search**: Búsqueda avanzada en todas las notas
-- **Rich Editor**: Editor Markdown con syntax highlighting
-
-## 🛠️ Stack Tecnológico
-
-- Next.js 14+ (App Router)
-- React 18+
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Prisma + SQLite
-- TipTap
-- Shiki
-- Fuse.js
+Aplicación web híbrida de organización de apuntes para programación. Un cuaderno digital inteligente donde puedes guardar notas diarias, conceptos, prompts y más.
 
 ## 🚀 Inicio Rápido
 
-### Prerrequisitos
-
-- Node.js 18+ 
-- npm o yarn
-
-### Instalación
+Primero, ejecuta el servidor de desarrollo:
 
 ```bash
-# Instalar dependencias
-npm install
-
-# Configurar base de datos
-npx prisma migrate dev
-
-# Ejecutar en desarrollo
 npm run dev
 ```
 
-La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-## 📚 Documentación
+## 📖 Documentación
 
-- [Arquitectura](./docs/architecture.md)
-- [Fuentes de Investigación](./docs/research-sources.md)
-- [Guía de Usuario](./docs/user-guide.md) (próximamente)
+- **[Cómo Funciona la App](./docs/como-funciona-la-app.md)** - Guía completa para principiantes sobre cómo funciona la aplicación y Next.js
+- **[Estado de Implementación](./docs/implementation-status.md)** - Estado actual del desarrollo del proyecto
 
-## 📝 Scripts Disponibles
+## 🛠️ Tecnologías
 
-- `npm run dev` - Inicia servidor de desarrollo
-- `npm run build` - Construye para producción
-- `npm run start` - Inicia servidor de producción
-- `npm run lint` - Ejecuta ESLint
-- `npm run format` - Formatea código con Prettier
-- `npm run format:check` - Verifica formato
+- **Next.js 16** - Framework de React
+- **TypeScript** - Tipado estático
+- **Prisma** - ORM para base de datos
+- **SQLite** - Base de datos
+- **Tailwind CSS** - Estilos
+- **shadcn/ui** - Componentes UI
+- **TipTap** - Editor de texto rico (pendiente de implementar completamente)
 
-## 🗂️ Estructura del Proyecto
+## Learn More
 
-Ver [docs/architecture.md](./docs/architecture.md) para detalles completos.
+To learn more about Next.js, take a look at the following resources:
 
-## 📄 Licencia
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-Este proyecto es de uso personal.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

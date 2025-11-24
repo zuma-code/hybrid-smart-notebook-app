@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,4 +118,206 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply outline-none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-muted-foreground float-left pointer-events-none h-0;
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold mt-6 mb-4;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold mt-5 mb-3;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-bold mt-4 mb-2;
+}
+
+.ProseMirror p {
+  @apply mb-4;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  @apply mb-4 pl-6;
+}
+
+.ProseMirror ul {
+  @apply list-disc;
+}
+
+.ProseMirror ol {
+  @apply list-decimal;
+}
+
+.ProseMirror li {
+  @apply mb-2;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-muted-foreground pl-4 italic my-4;
+}
+
+.ProseMirror code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.ProseMirror pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.ProseMirror pre code {
+  @apply bg-transparent p-0;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.ProseMirror a {
+  @apply text-blue-600 underline cursor-pointer;
+}
+
+/* Syntax Highlighting Styles */
+.hljs {
+  @apply bg-transparent;
+}
+
+pre code.hljs {
+  @apply p-0;
+}
+
+/* Animations for UI components */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-8px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(8px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+.animate-out {
+  animation: fade-out 0.15s ease-out;
+}
+
+.fade-in-0 {
+  animation: fade-in 0.15s ease-out;
+}
+
+.fade-out-0 {
+  animation: fade-out 0.15s ease-out;
+}
+
+.zoom-in-95 {
+  animation: zoom-in 0.15s ease-out;
+}
+
+.zoom-out-95 {
+  animation: zoom-out 0.15s ease-out;
+}
+
+.slide-in-from-top-2 {
+  animation: slide-in-from-top 0.15s ease-out;
+}
+
+.slide-in-from-bottom-2 {
+  animation: slide-in-from-bottom 0.15s ease-out;
+}
+
+.slide-in-from-left-2 {
+  animation: slide-in-from-left 0.15s ease-out;
+}
+
+.slide-in-from-right-2 {
+  animation: slide-in-from-right 0.15s ease-out;
+}
+
+/* Wiki-link styles */
+.wiki-link {
+  @apply inline-flex items-center px-1.5 py-0.5 rounded text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 cursor-pointer transition-colors;
+}
+
+.wiki-link:hover {
+  @apply bg-blue-200 dark:bg-blue-800;
 }

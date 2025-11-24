@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -11,41 +13,38 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import {
-  Home,
+  LayoutDashboard,
   Calendar,
   BookOpen,
   MessageSquare,
   Image as ImageIcon,
-  Search,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const menuItems = [
   {
     title: "Dashboard",
-    icon: Home,
-    href: "/",
+    url: "/",
+    icon: LayoutDashboard,
   },
   {
     title: "Daily Notes",
+    url: "/daily",
     icon: Calendar,
-    href: "/daily",
   },
   {
     title: "Conceptos",
+    url: "/concepts",
     icon: BookOpen,
-    href: "/concepts",
   },
   {
     title: "Prompts",
+    url: "/prompts",
     icon: MessageSquare,
-    href: "/prompts",
   },
   {
     title: "Galería",
+    url: "/gallery",
     icon: ImageIcon,
-    href: "/gallery",
   },
 ];
 
@@ -61,17 +60,12 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href || 
-                  (item.href !== "/" && pathname?.startsWith(item.href));
-                
+                const isActive = pathname === item.url || pathname.startsWith(item.url + "/");
                 return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                    >
-                      <Link href={item.href}>
-                        <Icon />
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.url}>
+                        <Icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -85,4 +79,9 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+
+
+
+
 
