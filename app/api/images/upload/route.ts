@@ -37,7 +37,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear directorio de uploads si no existe
-    const uploadsDir = join(process.cwd(), "public", "uploads");
+    // Usa UPLOADS_DIR de variables de entorno, o la ubicación por defecto
+    const uploadsDir = process.env.UPLOADS_DIR 
+      ? process.env.UPLOADS_DIR 
+      : join(process.cwd(), "public", "uploads");
+    
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true });
     }
@@ -71,4 +75,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
 

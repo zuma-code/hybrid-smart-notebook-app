@@ -146,3 +146,4 @@ La búsqueda global debería funcionar desde cualquier página:
 - [ ] La búsqueda difusa funciona (errores de escritura)
 - [ ] Muestra mensaje cuando no hay resultados
 
+

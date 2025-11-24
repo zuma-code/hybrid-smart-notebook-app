@@ -15,7 +15,10 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 ## 📖 Documentación
 
 - **[Cómo Funciona la App](./docs/como-funciona-la-app.md)** - Guía completa para principiantes sobre cómo funciona la aplicación y Next.js
+- **[React para Principiantes](./docs/react-para-principiantes.md)** - Explicación detallada de Componentes, Props, useState y useEffect con ejemplos
 - **[Estado de Implementación](./docs/implementation-status.md)** - Estado actual del desarrollo del proyecto
+- **[Guía: Variables de Entorno (Paso a Paso)](./docs/guia-variables-entorno-paso-a-paso.md)** - Cómo configurar y mover los datos usando variables de entorno
+- **[Mover Datos a Otra Ubicación](./docs/mover-datos-otra-ubicacion.md)** - Guía completa sobre opciones para mover datos
 
 ## 🛠️ Tecnologías
 

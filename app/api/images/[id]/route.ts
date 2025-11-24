@@ -24,7 +24,12 @@ export async function DELETE(
     }
 
     // Eliminar archivo físico
-    const filepath = join(process.cwd(), "public", image.path);
+    // Usa UPLOADS_DIR de variables de entorno, o la ubicación por defecto
+    const baseDir = process.env.UPLOADS_DIR 
+      ? process.env.UPLOADS_DIR 
+      : join(process.cwd(), "public");
+    
+    const filepath = join(baseDir, image.path);
     if (existsSync(filepath)) {
       await unlink(filepath);
     }
@@ -43,4 +48,6 @@ export async function DELETE(
     );
   }
 }
+
+
 

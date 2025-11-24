@@ -311,37 +311,32 @@ import { Card } from "@/components/ui/card";
 
 ## 🔑 Conceptos Clave de React (Usados en la App)
 
-### 1. **useState** - Estado del Componente
+> 📖 **Guía Completa:** Lee [React para Principiantes](./react-para-principiantes.md) para una explicación detallada con ejemplos.
 
+### Resumen Rápido:
+
+#### 1. **Componentes** - Piezas Reutilizables
+Funciones que devuelven código HTML (JSX) para mostrar en pantalla.
+
+#### 2. **Props** - Pasar Datos
+Datos que pasas de un componente padre a un componente hijo.
+
+#### 3. **useState** - Estado del Componente
 Guarda datos que pueden cambiar y actualizan la pantalla automáticamente.
 
 ```typescript
 const [concepts, setConcepts] = useState([]);
-
 // concepts = valor actual
 // setConcepts = función para cambiar el valor
 ```
 
-### 2. **useEffect** - Efectos Secundarios
-
+#### 4. **useEffect** - Efectos Secundarios
 Ejecuta código cuando algo cambia (cargar datos, suscripciones, etc.).
 
 ```typescript
 useEffect(() => {
   fetchConcepts(); // ← Se ejecuta cuando el componente se monta
 }, []); // ← Array vacío = solo una vez
-```
-
-### 3. **Props** - Pasar Datos entre Componentes
-
-```typescript
-// Componente padre
-<ConceptCard concept={conceptData} />
-
-// Componente hijo
-function ConceptCard({ concept }) {
-  return <div>{concept.title}</div>;
-}
 ```
 
 ---
@@ -442,5 +437,6 @@ npm run format:check
 ---
 
 **¿Tienes preguntas?** Revisa el código y experimenta. La mejor forma de aprender es practicando! 🚀
+
 
 
