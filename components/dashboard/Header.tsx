@@ -1,6 +1,7 @@
 "use client";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 
 export function Header() {
   return (
@@ -8,6 +9,9 @@ export function Header() {
       <SidebarTrigger className="-ml-1" />
       <div className="flex flex-1 items-center gap-2">
         <h2 className="text-lg font-semibold">Hybrid Smart Notebook</h2>
+      </div>
+      <div className="flex items-center gap-2">
+        <GlobalSearch />
       </div>
     </header>
   );
